@@ -1,0 +1,16 @@
+#设备类型
+dcuCpuNum = 1
+#主版本号
+mainVersion =1.00.00
+#子版本名字 与conf中对应 如有多个 按照conf的顺序罗列就可 
+sub1Name = test_app7.ext4
+#子版本号
+sub1Version =1.01.07
+#子版本大小单位为BYTE
+sub1Size = 266338304
+#子版本Md5校验值
+sub1Md5 = 07308683b76e68497d67569591b12229
+sub2Name = test_app8.ext4
+sub2Version =1.01.08
+sub2Size = 266338304
+sub2Md5 = 07308683b76e68497d67569591b12229
