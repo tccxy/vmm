@@ -54,7 +54,7 @@ struct vmp_get_data
     u8 trans_type; /**传输类型 ftp tftp*/
     u8 pad;
     u8 url[VMP_DEFINE_NAME_LEN]; /**文件名字*/
-    u8 data[0];                        /**other data*/
+    u8 data[0];                  /**other data*/
 };
 
 /**
@@ -65,8 +65,8 @@ struct vmp_subver_info
 {
     u8 subver_version[VMP_DEFINE_NAME_LEN]; /**子版本号 */
     u8 subver_name[VMP_DEFINE_NAME_LEN];    /**子版本名字*/
-    u32 size;                               /**版本大小 */
     u8 md5[VMP_DEFINE_NAME_LEN];            /**md5校验值,版本文件采用MD5校验 */
+    u64 size;                               /**版本大小 */
 };
 
 /**
@@ -80,7 +80,7 @@ struct vmp_mainver_info
     u8 is_use;                               /**目前是否使用该版本*/
     u8 is_update;                            /**设置更新标志*/
     u8 is_active;                            /**手动激活标志位*/
-    u8 subver_num;                          /**子版本个数 */
+    u8 subver_num;                           /**子版本个数 */
     u32 pad;
     struct vmp_subver_info subver_info[VMP_MAX_SUB_VER_NUM];
     u16 crc; /**校验值 */
@@ -98,7 +98,7 @@ struct vmp_verinfo_store
 #ifdef VMP_MANAGE_APP_EN
     struct vmp_mainver_info app_mainver_info[VMP_BACKUP_NUM]; /**划归到 app的提供主备版本的管理*/
 #endif
-    u32 pad;
+    u32 list_num; /**循环记录,该值是累加的，通过此值记录标志最新的一条版本信息*/
     u32 crc; /**版本控制信息校验值 */
 };
 
@@ -137,9 +137,9 @@ void init_crc32_table(u32 poly);
 u32 count_crc32(const u8 *pdata, u32 len, u32 crc);
 int cmd_parse_vertype(u8 *data, struct vmp_get_data *get_data);
 int vmp_ftp_parse_verdata(struct vmp_get_data *get_data, struct vmp_mainver_info *mainver_info);
-int vmp_ftp_version_file(u8 sub_index, u8 *version_file, u8 *version_locat, u8 *version_md5, u32 version_size);
+int vmp_ftp_version_file(u8 sub_index, u8 *version_file, u8 *version_locat, u8 *version_md5, u64 version_size);
 int vmp_http_parse_verdata(struct vmp_get_data *get_data, struct vmp_mainver_info *mainver_info);
-int vmp_http_version_file(u8 sub_index, u8 *version_file, u8 *version_locat, u8 *version_md5, u32 version_size);
+int vmp_http_version_file(u8 sub_index, u8 *version_file, u8 *version_locat, u8 *version_md5, u64 version_size);
 int vmp_parse_getdata(struct vmp_get_data *get_data, struct vmp_mainver_info *mainver_info);
 int vmp_puts_verinfo(u8 ver_type, struct vmp_verinfo_store *verinfo_store, u16 num);
 int vmp_set_store_value(u8 ver_type, struct vmp_verinfo_store *verinfo_store,

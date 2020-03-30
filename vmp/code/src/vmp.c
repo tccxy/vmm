@@ -276,7 +276,10 @@ int vmp_update_ver(struct vmp_get_data *get_data)
     zlog_debug(zc, "--%s ", mainver_info.subver_info[0].subver_version);
     zlog_debug(zc, "--%s ", mainver_info.subver_info[0].md5);
     zlog_debug(zc, "--%d ", mainver_info.subver_info[0].size);
-
+    zlog_debug(zc, "--%s ", mainver_info.subver_info[1].subver_name);
+    zlog_debug(zc, "--%s ", mainver_info.subver_info[1].subver_version);
+    zlog_debug(zc, "--%s ", mainver_info.subver_info[1].md5);
+    zlog_debug(zc, "--%u ", mainver_info.subver_info[1].size);
     /**根据版本类型进一步处理 */
     vmp_update_ver_deal(get_data->ver_type, get_data->trans_type, &mainver_info);
 

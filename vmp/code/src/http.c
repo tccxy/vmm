@@ -398,15 +398,12 @@ int vmp_http_parse_verdata(struct vmp_get_data *get_data, struct vmp_mainver_inf
  * @param version_size 版本大小
  * @return int 
  */
-int vmp_http_version_file(u8 sub_index, u8 *version_file, u8 *version_locat, u8 *version_md5, u32 version_size)
+int vmp_http_version_file(u8 sub_index, u8 *version_file, u8 *version_locat, u8 *version_md5, u64 version_size)
 {
     u32 ret = SUCCESS;
-    MD5_CTX md5;
-    s32 locatfd = -1;
-    u32 read_len = 0;
-    u32 read_offset = 0, i;
     u8 md5_value[VMP_DEFINE_NAME_LEN] = {0};
-    u8 md5_str[16] = {0};
+    u8 md5_cmd[VMP_DEFINE_NAME_LEN] = {0};
+    FILE *fp;
 
     zlog_debug(zc,"url is %s ", (u8 *)&download_url[sub_index][0]);
 
@@ -415,27 +412,20 @@ int vmp_http_version_file(u8 sub_index, u8 *version_file, u8 *version_locat, u8 
         return ret;
     printf("\r\ndownload success \r\n");
 
-    MD5Init(&md5);
-    locatfd = mmc_open(version_locat);
-    while (0 < version_size)
+    zlog_debug(zc, "start pop md5");
+    sprintf(md5_cmd, "md5sum %s", version_locat);
+    zlog_debug(zc, "md5_cmd %s", md5_cmd);
+    fp = popen(md5_cmd, "r");
+    if (fp != NULL)
     {
-
-        read_len = mmc_read(locatfd, read_offset, sizeof(ga_trans_data), ga_trans_data);
-
-        MD5Update(&md5, ga_trans_data, read_len);
-        version_size -= read_len;
-        read_offset += read_len;
+        fgets(md5_value, sizeof(md5_value), fp);
+        zlog_debug(zc, "pop calc md5 %s ", md5_value);
+        pclose(fp);
     }
-    mmc_close(locatfd);
-    MD5Final(&md5, md5_str);
-    for (i = 0; i < 16; i++)
-    {
-        snprintf(md5_value + i * 2, 2 + 1, "%02x", md5_str[i]);
-    }
-    zlog_debug(zc,"calc md5 %s ", md5_value);
-    zlog_debug(zc,"input md5 %s ", version_md5);
-
-    if (strcmp(md5_value, version_md5))
+    zlog_debug(zc, "end pop md5");
+    zlog_debug(zc, "calc md5 %s ", md5_value);
+    zlog_debug(zc, "input md5 %s ", version_md5);
+    if (strncmp(md5_value, version_md5, 32))
     {
         printf("md5 check error .");
         ret = ERR_HTTP_FILE_MD5;

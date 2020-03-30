@@ -17,7 +17,7 @@
 #define ERR_FLASH_START (0xFF000000) /**flash模块 错误码基值*/
 #define ERR_MMC_START (0xFF000100)   /**mmc模块 错误码基值*/
 #define ERR_HTTP_START (0xFF000300)  /**HTTP模块 错误码基值*/
-#define ERR_FTP_START (0xFF000400)  /**FTP模块 错误码基值*/
+#define ERR_FTP_START (0xFF000400)   /**FTP模块 错误码基值*/
 #define ERR_VMP_START (0xFF001000)   /**vmp模块 错误码基值*/
 /***********************************************************
 *                          FLASH模块错误码                   *
@@ -47,20 +47,21 @@
 /***********************************************************
 *   FTP错误码                                             *
 ***********************************************************/
-#define ERR_FTP_OPEN_FILE (ERR_FTP_START + 1)       /**FTP打开文件错误 */
-#define ERR_FTP_TRANS_ERROR (ERR_FTP_START + 2) /**传输错误 */
-#define ERR_FTP_FILE_MD5 (ERR_FTP_START + 3) /**md5校验错误 */
-#define ERR_FTP_SUBVER_NUM (ERR_FTP_START + 4) /**子版本个数错误 */
+#define ERR_FTP_OPEN_FILE (ERR_FTP_START + 1)    /**FTP打开文件错误 */
+#define ERR_FTP_TRANS_ERROR (ERR_FTP_START + 2)  /**传输错误 */
+#define ERR_FTP_FILE_MD5 (ERR_FTP_START + 3)     /**md5校验错误 */
+#define ERR_FTP_SUBVER_NUM (ERR_FTP_START + 4)   /**子版本个数错误 */
+#define ERR_FTP_NULL_POINTER (ERR_FTP_START + 5) /**空指针错误*/
 /***********************************************************
 *   HTTP错误码                                             *
 ***********************************************************/
-#define ERR_HTTP_URL (ERR_HTTP_START + 1)       /**url格式错误 */
-#define ERR_HTTP_SEND_JSON (ERR_HTTP_START + 2) /**构造发送json格式错误 */
-#define ERR_HTTP_PARSE_JSON (ERR_HTTP_START + 3) /**解析json格式错误 */
-#define ERR_HTTP_POST_DATA (ERR_HTTP_START + 4) /**构造发送json格式错误 */
-#define ERR_HTTP_SUB_NUM (ERR_HTTP_START + 5) /**子版本个数错误 */
+#define ERR_HTTP_URL (ERR_HTTP_START + 1)           /**url格式错误 */
+#define ERR_HTTP_SEND_JSON (ERR_HTTP_START + 2)     /**构造发送json格式错误 */
+#define ERR_HTTP_PARSE_JSON (ERR_HTTP_START + 3)    /**解析json格式错误 */
+#define ERR_HTTP_POST_DATA (ERR_HTTP_START + 4)     /**构造发送json格式错误 */
+#define ERR_HTTP_SUB_NUM (ERR_HTTP_START + 5)       /**子版本个数错误 */
 #define ERR_HTTP_DOWNLOAD_FILE (ERR_HTTP_START + 6) /**下载文件错误 */
-#define ERR_HTTP_FILE_MD5 (ERR_HTTP_START + 7) /**md5校验错误 */
+#define ERR_HTTP_FILE_MD5 (ERR_HTTP_START + 7)      /**md5校验错误 */
 /***********************************************************
 *                          VMP模块错误码                   *
 ***********************************************************/

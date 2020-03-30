@@ -11,7 +11,7 @@
 #include "pub.h"
 
 static int progress_func(void *ptr, double TotalToDownload, double NowDownloaded,
-                  double TotalToUpload, double NowUploaded)
+                         double TotalToUpload, double NowUploaded)
 {
     int totaldotz = 40;
     double fractiondownloaded = NowDownloaded / TotalToDownload;
@@ -19,7 +19,7 @@ static int progress_func(void *ptr, double TotalToDownload, double NowDownloaded
     int dotz = round(fractiondownloaded * totaldotz);
 
     int ii = 0;
-    if (0 == times % 1000 || (NowDownloaded == TotalToDownload))//减少一下刷新率
+    if (0 == times % 1000 || (NowDownloaded == TotalToDownload)) //减少一下刷新率
     {
         printf("%3.0f%% [", fractiondownloaded * 100);
 
@@ -93,7 +93,7 @@ int ftp_download_file(const char *remote_path, const char *user, const char *pas
     file = fopen(localpath, "ab+");
     if (file == NULL)
     {
-        zlog_debug(zc,"file open filed .");
+        zlog_debug(zc, "file open filed .");
         return ERR_FTP_OPEN_FILE;
     }
     ret = curl_global_init(CURL_GLOBAL_ALL);
@@ -142,8 +142,8 @@ static size_t ftp_rcv_data(char *ptr, size_t size, size_t nmemb, void *userdata)
 
     u8 *p = userdata;
     len = size * nmemb;
-    zlog_debug(zc,"in ");
-    zlog_debug(zc,"len is %d ", len);
+    zlog_debug(zc, "in ");
+    zlog_debug(zc, "len is %d ", len);
     //zlog_debug(zc,"ptr is %s ", ptr);
     memcpy(p + offset, ptr, len);
     offset += len;
@@ -292,7 +292,7 @@ static int ftp_parse_version_description(u8 *version_data, struct vmp_mainver_in
         {
             return ERR_VMP_VERSION_INFO_STRING;
         }
-        zlog_debug(zc,"key = '%s', value = '%s' ", key, value);
+        zlog_debug(zc, "key = '%s', value = '%s' ", key, value);
         if (NULL != strstr(key, "mainVersion"))
             memcpy(mainver_info->mainver_version, value, strlen(value));
         //if (NULL != strstr(key, "mainName"))
@@ -340,17 +340,17 @@ int vmp_ftp_parse_verdata(struct vmp_get_data *get_data, struct vmp_mainver_info
     ftp_url = get_data->url;
     ftp_data = get_data->data;
 
-    zlog_debug(zc,"ftp_url is %s ", ftp_url);
+    zlog_debug(zc, "ftp_url is %s ", ftp_url);
 
     sscanf(ftp_data, "%[^:]%*c%[^:]%*c%[^:] ", &filename, &user, &passwd);
-    zlog_debug(zc,"filename %s user is %s passwd is %s ", filename, user, passwd);
+    zlog_debug(zc, "filename %s user is %s passwd is %s ", filename, user, passwd);
 
     memcpy(ftp_server_data, ftp_url, strlen(ftp_url)); //暂存ftp服务信息
     memcpy(ftp_usr, user, strlen(user));               //暂存ftp服务信息
     memcpy(ftp_passwd, passwd, strlen(passwd));        //暂存ftp服务信息
 
     sprintf(url, "%s/%s", ftp_url, filename); //构造完整路径
-    zlog_debug(zc,"url is %s ", url);
+    zlog_debug(zc, "url is %s ", url);
     ret = ftp_download_data(url, user, passwd, ga_trans_data);
     if (ret)
         return ret;
@@ -370,46 +370,36 @@ int vmp_ftp_parse_verdata(struct vmp_get_data *get_data, struct vmp_mainver_info
  * @param version_size 版本大小
  * @return int 
  */
-int vmp_ftp_version_file(u8 sub_index, u8 *version_file, u8 *version_locat, u8 *version_md5, u32 version_size)
+#define MD5_BUF_SIZE (10 * 1024 * 1024)
+int vmp_ftp_version_file(u8 sub_index, u8 *version_file, u8 *version_locat, u8 *version_md5, u64 version_size)
 {
     u32 ret = SUCCESS;
     u8 url[1024];
-    MD5_CTX md5;
-    s32 locatfd = -1;
-    u32 read_len = 0;
-    u32 read_offset = 0, i;
     u8 md5_value[VMP_DEFINE_NAME_LEN] = {0};
-    u8 md5_str[16] = {0};
+    u8 md5_cmd[VMP_DEFINE_NAME_LEN] = {0};
+    FILE *fp;
 
     sprintf(url, "%s/%s", ftp_server_data, version_file); //构造完整路径
-    zlog_debug(zc,"url is %s ", url);
-
+    zlog_debug(zc, "url is %s ", url);
     ret = ftp_download_file(url, ftp_usr, ftp_passwd, version_locat, 1, 3);
     if (ret)
         return ret;
     printf("\r\ndownload success \r\n");
 
-    MD5Init(&md5);
-    locatfd = mmc_open(version_locat);
-    while (0 < version_size)
+    zlog_debug(zc, "start pop md5");
+    sprintf(md5_cmd, "md5sum %s", version_locat);
+    zlog_debug(zc, "md5_cmd %s", md5_cmd);
+    fp = popen(md5_cmd, "r");
+    if (fp != NULL)
     {
-
-        read_len = mmc_read(locatfd, read_offset, sizeof(ga_trans_data), ga_trans_data);
-
-        MD5Update(&md5, ga_trans_data, read_len);
-        version_size -= read_len;
-        read_offset += read_len;
+        fgets(md5_value, sizeof(md5_value), fp);
+        zlog_debug(zc, "pop calc md5 %s ", md5_value);
+        pclose(fp);
     }
-    mmc_close(locatfd);
-    MD5Final(&md5, md5_str);
-    for (i = 0; i < 16; i++)
-    {
-        snprintf(md5_value + i * 2, 2 + 1, "%02x", md5_str[i]);
-    }
-    zlog_debug(zc,"calc md5 %s ", md5_value);
-    zlog_debug(zc,"input md5 %s ", version_md5);
-
-    if (strcmp(md5_value, version_md5))
+    zlog_debug(zc, "end pop md5");
+    zlog_debug(zc, "calc md5 %s ", md5_value);
+    zlog_debug(zc, "input md5 %s ", version_md5);
+    if (strncmp(md5_value, version_md5, 32))
     {
         printf("md5 check error .");
         ret = ERR_FTP_FILE_MD5;

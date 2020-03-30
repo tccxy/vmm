@@ -58,14 +58,17 @@ static int htoi(u8 *s)
  * 
  * @param dev_info 版本信息存储位置
  * @param info_num 版本条目数
+ * @param u32 *list
  * @return int 
  */
-int vmp_get_verctrl_infonum(u8 *dev_info, u16 *info_num)
+int vmp_get_verctrl_infonum(u8 *dev_info, u16 *info_num, u32 *list)
 {
     u16 loop = 0;
     u32 offset = 0;
     u16 num = 0;
     s32 locatfd = -1;
+    u32 list_num_old = 0;
+    u32 list_num = 0;
     struct vmp_verinfo_store verinfo_store;
 
     locatfd = mmc_open(dev_info);
@@ -86,11 +89,18 @@ int vmp_get_verctrl_infonum(u8 *dev_info, u16 *info_num)
             {
                 break;
             }
+            list_num = verinfo_store.list_num;
+            if (list_num < list_num_old)
+            {
+                num--;
+                break; //有循环记录的数据产生
+            }
+            list_num_old = list_num;
         }
         offset += sizeof(struct vmp_verinfo_store);
     }
     *info_num = num;
-
+    *list = list_num_old;
     mmc_close(locatfd);
     return SUCCESS;
 }
@@ -302,18 +312,19 @@ int vmp_set_store_value(u8 ver_type, struct vmp_verinfo_store *verinfo_store,
  * @param dev_info 版本信息的存储位置
  * @param info_num 获取的条目数
  * @param data 版本信息索引
- * @return int 
+ * @param u16 *true_num
  */
 int vmp_get_verctrl_info(u8 *dev_info, u16 info_num, u8 *data, u16 *true_num)
 {
     u16 info_all_num = 0;
     u32 ret = 0;
     u32 offset = 0;
+    u32 list;
     if (info_num > VMP_VER_INFO_MAX_NUM)
     {
         return ERR_VMP_INFO_MAX_NUM;
     }
-    ret = vmp_get_verctrl_infonum(dev_info, &info_all_num);
+    ret = vmp_get_verctrl_infonum(dev_info, &info_all_num, &list);
     if (ret)
         return ret;
 
@@ -321,6 +332,7 @@ int vmp_get_verctrl_info(u8 *dev_info, u16 info_num, u8 *data, u16 *true_num)
         info_num = info_all_num; //如果获取条数大于总数，则获取最大数
 
     *true_num = info_all_num;
+
 
     if (0 == info_all_num)
         offset = 0; //没有信息的时候返回最开始的信息
@@ -347,18 +359,24 @@ int vmp_set_verctrl_info(u8 *dev_info, u8 *data)
     u32 ret = 0;
     u32 offset = 0;
     s32 locatfd = -1;
-
+    u32 list;
     locatfd = mmc_open(dev_info);
+    struct vmp_verinfo_store *write_data = NULL;
 
-    ret = vmp_get_verctrl_infonum(dev_info, &info_all_num);
+    write_data = (struct vmp_verinfo_store *)data;
+    ret = vmp_get_verctrl_infonum(dev_info, &info_all_num, &list);
     if (ret)
         return ret;
 
-    if (info_all_num >= ERR_VMP_INFO_MAX_NUM)
+    zlog_debug(zc, "have %d info", info_all_num);
+    if (info_all_num >= VMP_VER_INFO_MAX_NUM)
         offset = 0;
     else
         offset = info_all_num * sizeof(struct vmp_verinfo_store); //获取偏移
 
+    write_data->list_num = list + 1;
+
+    zlog_info(zc, "write_data->list_num %d ", write_data->list_num);
     if (0 > mmc_write(locatfd, offset, sizeof(struct vmp_verinfo_store),
                       data))
         return ERR_VMP_INFO_WRITE;
@@ -379,7 +397,10 @@ int vmp_set_verctrl_info(u8 *dev_info, u8 *data)
 int vmp_download_subver(u8 sub_index, u8 download_index, u8 download_type, struct vmp_subver_info *subver_info, struct vmp_subver_def *subver_def)
 {
     u32 ret = 0;
-
+    zlog_debug(zc, "version %s name %s size %u md5 %s ", subver_info->subver_version,
+               subver_info->subver_name, subver_info->size, subver_info->md5);
+    zlog_debug(zc, "dowanload locat %s  ", subver_def->ver_store[download_index].location);
+    zlog_debug(zc, "download_type %c ", download_type);
     //boot 版本不分主备版本，直接下载到存储的0位置上
     if (download_index == 0xff)
     {
@@ -446,6 +467,7 @@ int vmp_update_ver_deal(u8 ver_type, u8 trans_type, struct vmp_mainver_info *mai
     {
         //正在使用的版本该值为1 备用版本该值为0
         downloa_index = (verinfo_store.sys_mainver_info[0].is_use) > 0 ? 1 : 0;
+        zlog_debug(zc, "downloa_index %x ", downloa_index);
         memcpy((u8 *)&(verinfo_store.sys_mainver_info[downloa_index]), (u8 *)mainver_info,
                sizeof(struct vmp_mainver_info));
         //更新标志位
@@ -500,6 +522,7 @@ int vmp_get_ver_deal(u8 ver_type, u16 num)
     struct vmp_verinfo_store verinfo_store[VMP_VER_INFO_MAX_NUM] = {0};
 
     ret = vmp_get_verctrl_info(VMP_VER_INFO_STORE_LOCATION, num, verinfo_store, &true_num);
+
     if (ret)
     {
         zlog_error(zc, "%s error code %x \r\n", __func__, ret);
@@ -513,6 +536,7 @@ int vmp_get_ver_deal(u8 ver_type, u16 num)
         //zlog_info(zc, "get version info item %d ", num); //记录info日志
         for (loop = 0; loop < num; loop++)
         {
+            zlog_debug(zc, "verinfo_store.list_num %d", verinfo_store[loop].list_num);
             vmp_puts_verinfo(ver_type, &verinfo_store[loop], loop);
         }
     }
@@ -573,6 +597,7 @@ int vmp_load_ver_deal(u8 *mount_dir)
     struct vmp_verinfo_store verinfo_store = {0};
 
     ret = vmp_get_verctrl_info(VMP_VER_INFO_STORE_LOCATION, 1, &verinfo_store, &true_num);
+    zlog_debug(zc, "verinfo_store.list_num %d", verinfo_store.list_num);
     if (ret)
     {
         zlog_error(zc, "%s error code %x \r\n", __func__, ret);
@@ -659,6 +684,7 @@ int vmp_ota_ver_deal(u8 ver_type, u8 trans_type, struct vmp_mainver_info *mainve
 
     zlog_info(zc, "ota version is %s ", mainver_info->mainver_version);
     ret = vmp_get_verctrl_info(VMP_VER_INFO_STORE_LOCATION, 1, &verinfo_store, &true_num);
+    zlog_debug(zc, "verinfo_store.list_num %d", verinfo_store.list_num);
     if (ret)
     {
         zlog_error(zc, "%s error code %x \r\n", __func__, ret);
@@ -675,10 +701,36 @@ int vmp_ota_ver_deal(u8 ver_type, u8 trans_type, struct vmp_mainver_info *mainve
         //正在使用的版本该值为1 备用版本该值为0
         downloa_index = (verinfo_store.sys_mainver_info[0].is_use) > 0 ? 1 : 0;
         load_index = (verinfo_store.sys_mainver_info[0].is_use) > 0 ? 0 : 1;
-        memcpy((u8 *)&(verinfo_store.sys_mainver_info[downloa_index]), (u8 *)mainver_info,
-               sizeof(struct vmp_mainver_info));
-        //更新标志位
-        verinfo_store.sys_mainver_info[downloa_index].is_update = 1;
+        zlog_debug(zc, "downloa_index %x load_index %x", downloa_index, load_index);
+
+        zlog_info(zc, "load version is %s ", verinfo_store.sys_mainver_info[load_index].mainver_version);
+        if (1 == verinfo_store.sys_mainver_info[load_index].is_active) //有激活的情况发生
+        {
+            //被激活的版本将不会与服务器校验本版本，而是 校验另一版本
+            printf("now is active state \r\n");
+            printf("back version is %s \r\n", verinfo_store.sys_mainver_info[downloa_index].mainver_version);
+            if ((load_index != downloa_index) &&
+                (htoi(verinfo_store.sys_mainver_info[downloa_index].mainver_version) < htoi(mainver_info->mainver_version)))
+            {
+                memcpy((u8 *)&(verinfo_store.sys_mainver_info[downloa_index]), (u8 *)mainver_info,
+                       sizeof(struct vmp_mainver_info));
+                //更新标志位
+                verinfo_store.sys_mainver_info[downloa_index].is_update = 1;
+                download_flag = 1;
+            }
+        }
+        else
+        {
+            if ((load_index != downloa_index) &&
+                (htoi(verinfo_store.sys_mainver_info[load_index].mainver_version) < htoi(mainver_info->mainver_version)))
+            {
+                memcpy((u8 *)&(verinfo_store.sys_mainver_info[downloa_index]), (u8 *)mainver_info,
+                       sizeof(struct vmp_mainver_info));
+                //更新标志位
+                verinfo_store.sys_mainver_info[downloa_index].is_update = 1;
+                download_flag = 1;
+            }
+        }
     }
 #ifdef VMP_MANAGE_APP_EN
     if (VMP_VER_TYPE_APP == ver_type)
@@ -756,11 +808,12 @@ int vmp_active_ver_deal(u8 ver_type)
     struct vmp_verinfo_store verinfo_store = {0};
     struct vmp_mainver_info *mainver_info = NULL;
     u8 active_index = 0;
-    /**重要 ！！！！版本激活只是用于将备份的有效版本激活，备份版本的有效指的是含有版本信息的非当前使用版
+    /**重要 ！！！！版本激活只是用于将****备份的有效版本激活****，备份版本的有效指的是含有版本信息的非当前使用版
      * 一旦备份版本被激活后，ota将不会用于等同于主版本号的版本，但不影响手动更新
      * eg ：主：1.00.05 备：1.00.04 当1.00.04版本被激活后，不会再重新ota1.00.05，直至1.00.06版本的更新发生
     */
     ret = vmp_get_verctrl_info(VMP_VER_INFO_STORE_LOCATION, 1, &verinfo_store, &true_num); //获取最新的一条版本信息
+    zlog_debug(zc, "verinfo_store.list_num %d", verinfo_store.list_num);
     if (ret)
         return ret;
 
@@ -810,7 +863,7 @@ int vmp_active_ver_deal(u8 ver_type)
  */
 int vmp_deactive_ver_deal(u8 ver_type)
 {
-    u32 ret = 0;
+    u32 ret = 0, i;
     u16 true_num = 0;
     struct vmp_verinfo_store verinfo_store = {0};
     struct vmp_mainver_info *mainver_info = NULL;
@@ -818,40 +871,43 @@ int vmp_deactive_ver_deal(u8 ver_type)
     /**重要 ！！！！版本去激活是清除掉版本激活的标志位，使已激活的版本进行正常的ota活动
     */
     ret = vmp_get_verctrl_info(VMP_VER_INFO_STORE_LOCATION, 1, &verinfo_store, &true_num); //获取最新的一条版本信息
+    zlog_debug(zc, "verinfo_store.list_num %d", verinfo_store.list_num);
     if (ret)
     {
         zlog_error(zc, "deactive error code %x \r\n", ret);
         return ret;
     }
-    if (VMP_VER_TYPE_SYS == ver_type)
+    //去版本激活会将主备版本的激活标志都清除掉
+    for (i = 0; i < VMP_BACKUP_NUM; i++)
     {
-        load_index = (verinfo_store.sys_mainver_info[0].is_use) > 0 ? 0 : 1;
-        mainver_info = &(verinfo_store.sys_mainver_info[load_index]);
-    }
-#ifdef VMP_MANAGE_APP_EN
-    if (VMP_VER_TYPE_APP == ver_type)
-    {
-        load_index = (verinfo_store.app_mainver_info[0].is_use) > 0 ? 0 : 1;
-        mainver_info = &(verinfo_store.app_mainver_info[load_index]);
-    }
-#endif
-    zlog_debug(zc, "load_index %x", load_index);
-    zlog_info(zc, "deactive type %x ", ver_type); //记录info日志
-    if (mainver_info->mainver_version[0] != 0 && mainver_info->subver_num != 0)
-    {
-        mainver_info->is_active = 0; //清除版本激活标志位
-
-        ret = vmp_set_verctrl_info(VMP_VER_INFO_STORE_LOCATION, &verinfo_store);
-        if (ret)
+        if (VMP_VER_TYPE_SYS == ver_type)
         {
-            zlog_error(zc, "%s error code %x \r\n", __func__, ret);
-            return ret;
+            mainver_info = &(verinfo_store.sys_mainver_info[i]);
+        }
+#ifdef VMP_MANAGE_APP_EN
+        if (VMP_VER_TYPE_APP == ver_type)
+        {
+            mainver_info = &(verinfo_store.app_mainver_info[i]);
+        }
+#endif
+        zlog_debug(zc, "load_index %x", load_index);
+        zlog_info(zc, "deactive type %x ", ver_type); //记录info日志
+        if (mainver_info->mainver_version[0] != 0 && mainver_info->subver_num != 0)
+        {
+            zlog_debug(zc, "deactive version index  %x", load_index);
+            mainver_info->is_active = 0; //清除版本激活标志位
+            mainver_info->is_update = 0;
+            ret = vmp_set_verctrl_info(VMP_VER_INFO_STORE_LOCATION, &verinfo_store);
+            if (ret)
+            {
+                zlog_error(zc, "%s error code %x \r\n", __func__, ret);
+                return ret;
+            }
+        }
+        else
+        {
+            //无有效的激活版本
         }
     }
-    else
-    {
-        //无有效的激活版本
-    }
-
     return SUCCESS;
 }
