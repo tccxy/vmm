@@ -9,7 +9,16 @@
  * 
  */
 #include "pub.h"
+#ifdef ZYNQMP
 #include "vmp_zynqmp.conf"
+#endif
+#ifdef RK3399
+#include "vmp_rk3399.conf"
+#endif
+#ifdef ZQ7020
+#include "vmp_zq7020.conf"
+#endif
+
 
 /**用来临时存储传输文件*/
 u8 ga_trans_data[VMP_TRANS_FILEDATA_LEN];
@@ -332,7 +341,6 @@ int vmp_get_verctrl_info(u8 *dev_info, u16 info_num, u8 *data, u16 *true_num)
         info_num = info_all_num; //如果获取条数大于总数，则获取最大数
 
     *true_num = info_all_num;
-
 
     if (0 == info_all_num)
         offset = 0; //没有信息的时候返回最开始的信息
