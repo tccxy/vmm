@@ -1,7 +1,7 @@
 #!/bin/sh
 
 # now 9 parted          all is 8g
-#1st is spl             8000s
+#1st is spl             8000s 1s=512k
 #2nd is uboot           8192s
 #3rd is trust           8192s
 #4th is kernel          262144s
