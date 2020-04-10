@@ -381,7 +381,7 @@ int vmp_ftp_version_file(u8 sub_index, u8 *version_file, u8 *version_locat, u8 *
 
     sprintf(url, "%s/%s", ftp_server_data, version_file); //构造完整路径
     zlog_debug(zc, "url is %s ", url);
-    ret = ftp_download_file(url, ftp_usr, ftp_passwd, version_locat, 1, 3);
+    ret = ftp_download_file(url, ftp_usr, ftp_passwd, version_locat, 5, 3);
     if (ret)
         return ret;
     printf("\r\ndownload success \r\n");

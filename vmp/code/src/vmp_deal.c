@@ -19,7 +19,6 @@
 #include "vmp_zq7020.conf"
 #endif
 
-
 /**用来临时存储传输文件*/
 u8 ga_trans_data[VMP_TRANS_FILEDATA_LEN];
 
@@ -683,6 +682,7 @@ int vmp_ota_ver_deal(u8 ver_type, u8 trans_type, struct vmp_mainver_info *mainve
     u8 downloa_index = 0; //下载版本的索引
     u8 download_flag = 0;
     u8 load_index = 0; //加载索引
+    //u8 cmd[VMP_DEFINE_NAME_LEN * 2] = {0};
     struct vmp_verinfo_store verinfo_store = {0};
 
     /**重要 ！！！！此接口应当在load结束后再进行调用！！！！！，\
@@ -782,6 +782,8 @@ int vmp_ota_ver_deal(u8 ver_type, u8 trans_type, struct vmp_mainver_info *mainve
     if (download_flag)
     {
         printf("start ota .\r\n");
+        //sprintf(cmd, "aplay /home/ab64/ab_data/voice/ota01.wav");
+        //system(cmd);
         for (loop = 0; loop < mainver_info->subver_num; loop++)
         {
             ret = vmp_download_subver(loop, downloa_index, trans_type, &(mainver_info->subver_info[loop]), &(sat_mainver_def[ver_type].subver_def[loop]));
@@ -798,6 +800,8 @@ int vmp_ota_ver_deal(u8 ver_type, u8 trans_type, struct vmp_mainver_info *mainve
             zlog_error(zc, "%s error code %x \r\n", __func__, ret);
             return ret;
         }
+        //sprintf(cmd, "aplay /home/ab64/ab_data/voice/ota02.wav");
+        //system(cmd);
     }
     printf("ota end .\r\n");
     return SUCCESS;
@@ -900,7 +904,7 @@ int vmp_deactive_ver_deal(u8 ver_type)
 #endif
         zlog_debug(zc, "load_index %x", load_index);
         zlog_info(zc, "deactive type %x ", ver_type); //记录info日志
-        if (mainver_info->mainver_version[0] != 0 && mainver_info->subver_num != 0)
+        if (mainver_info->subver_num != 0)
         {
             zlog_debug(zc, "deactive version index  %x", load_index);
             mainver_info->is_active = 0; //清除版本激活标志位

@@ -1,8 +1,8 @@
 ######################################################################
 #                  Source path information  1                        #
 ######################################################################
-export CC = arm-linux-gnueabihf-gcc
-#export CC = aarch64-linux-gnu-gcc
+#export CC = arm-linux-gnueabihf-gcc
+export CC = aarch64-linux-gnu-gcc
 export ROOT_DIR      :=  $(shell pwd)
 export SRC_DIR       :=  $(ROOT_DIR)/src
 export INC_DIR       :=  $(ROOT_DIR)/include

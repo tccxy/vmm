@@ -407,7 +407,7 @@ int vmp_http_version_file(u8 sub_index, u8 *version_file, u8 *version_locat, u8 
 
     zlog_debug(zc,"url is %s ", (u8 *)&download_url[sub_index][0]);
 
-    ret = http_download_file((u8 *)&download_url[sub_index][0], version_locat, 1, 3);
+    ret = http_download_file((u8 *)&download_url[sub_index][0], version_locat, 5, 3);
     if (ret)
         return ret;
     printf("\r\ndownload success \r\n");
