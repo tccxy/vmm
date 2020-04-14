@@ -4,16 +4,16 @@
  * @brief mmc设备操作实现的支撑函数
  * @version 0.1
  * @date 2019-12-18
- * 
+ *
  * @copyright Copyright (c) 2019
- * 
+ *
  */
 
 #include "pub.h"
 
 /**
  * @brief 打开mmc设备获取文件描述符
- * 
+ *
  * @param partition_name 分区描述 eg:/dev/mmcblk0p3
  * @return u32 描述符
  */
@@ -37,9 +37,9 @@ u32 mmc_open(u8 *partition_name)
 
 /**
  * @brief 关闭mmc设备
- * 
+ *
  * @param fd 描述符
- * @return u32 
+ * @return u32
  */
 u32 mmc_close(s32 fd)
 {
@@ -54,7 +54,7 @@ u32 mmc_close(s32 fd)
 
 /**
  * @brief 从mmc设备读取数据
- * 
+ *
  * @param fd 描述符
  * @param offset 偏移地址
  * @param len 长度
@@ -63,10 +63,8 @@ u32 mmc_close(s32 fd)
  */
 u32 mmc_read(s32 fd, u32 offset, u32 len, u8 *buf)
 {
-
     s32 result = -1;
     s32 true_len = 0;
-
 
     /*移动文件指针,指向要操作的起始地址*/
     result = lseek(fd, offset, SEEK_SET);
@@ -81,7 +79,7 @@ u32 mmc_read(s32 fd, u32 offset, u32 len, u8 *buf)
     true_len = read(fd, buf, len);
     if (true_len < 0)
     {
-        FLASH_DEBUG("mmc read length error!\n");
+        MMC_DEBUG("mmc read length error!\n");
         mmc_close(fd);
         return ERR_MMC_READ;
     }
@@ -91,7 +89,7 @@ u32 mmc_read(s32 fd, u32 offset, u32 len, u8 *buf)
 
 /**
  * @brief mmc设备写入函数
- * 
+ *
  * @param fd 描述符
  * @param offset 偏移地址
  * @param len 长度
@@ -116,7 +114,7 @@ u32 mmc_write(s32 fd, u32 offset, u32 len, u8 *buf)
     true_len = write(fd, buf, len);
     if (true_len < 0)
     {
-        FLASH_DEBUG("mmc write length error!\n");
+        MMC_DEBUG("mmc write length error!\n");
         mmc_close(fd);
         return ERR_MMC_WRITE;
     }

@@ -1,5 +1,4 @@
-OBJS := $(OBJ_DIR)/flash.o \
-		$(OBJ_DIR)/mmc.o \
+OBJS := $(OBJ_DIR)/mmc.o \
 		$(OBJ_DIR)/crc.o \
 		$(OBJ_DIR)/md5.o \
 		$(OBJ_DIR)/ftp.o \
@@ -12,9 +11,6 @@ OBJS := $(OBJ_DIR)/flash.o \
 .PHONY : all
 
 all : $(OBJS) 
-
-$(OBJ_DIR)/flash.o : ./flash.c
-	$(CC) $(CFLAGS) $(DFLAGS) -c $< -o $@
 
 $(OBJ_DIR)/mmc.o : ./mmc.c
 	$(CC) $(CFLAGS) $(DFLAGS) -c $< -o $@

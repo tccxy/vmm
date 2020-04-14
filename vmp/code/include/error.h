@@ -14,27 +14,11 @@
 #define TRUE (1)
 #define FALSE (0)
 
-#define ERR_FLASH_START (0xFF000000) /**flash模块 错误码基值*/
-#define ERR_MMC_START (0xFF000100)   /**mmc模块 错误码基值*/
-#define ERR_HTTP_START (0xFF000300)  /**HTTP模块 错误码基值*/
-#define ERR_FTP_START (0xFF000400)   /**FTP模块 错误码基值*/
-#define ERR_VMP_START (0xFF001000)   /**vmp模块 错误码基值*/
-/***********************************************************
-*                          FLASH模块错误码                   *
-***********************************************************/
-#define ERR_FLASH_OFFSET (ERR_FLASH_START + 1)       /**flash偏移地址错误*/
-#define ERR_FLASH_MTDINDEX (ERR_FLASH_START + 2)     /**flash索引错误*/
-#define ERR_FLASH_MTDOPEN (ERR_FLASH_START + 3)      /**flash设备打开错误*/
-#define ERR_FLASH_READ (ERR_FLASH_START + 4)         /**flash设备读错误*/
-#define ERR_FLASH_WRITE (ERR_FLASH_START + 5)        /**flash设备写错误*/
-#define ERR_FLASH_ERASEMALLOC (ERR_FLASH_START + 6)  /**flash设备擦除申请内存错误*/
-#define ERR_FLASH_ERASE (ERR_FLASH_START + 7)        /**flash设备擦除错误*/
-#define ERR_FLASH_NULL_POINTER (ERR_FLASH_START + 8) /**flash设备操作空指针错误*/
-#define ERR_FLASH_OPEN_FILE (ERR_FLASH_START + 9)    /**flash设备打开错误*/
-#define ERR_FLASH_READ_FILE (ERR_FLASH_START + 10)   /**flash设备读文件错误*/
-#define ERR_FLASH_TYPE (ERR_FLASH_START + 11)        /**flash设备类型错误*/
-#define ERR_FLASH_MALLOC (ERR_FLASH_START + 12)      /**flash设备开内存错误*/
-#define ERR_FLASH_UNUSED (ERR_FLASH_START + 13)      /**flash设备其他错误*/
+#define ERR_MMC_START (0xFF000100)  /**mmc模块 错误码基值*/
+#define ERR_HTTP_START (0xFF000300) /**HTTP模块 错误码基值*/
+#define ERR_FTP_START (0xFF000400)  /**FTP模块 错误码基值*/
+#define ERR_VMP_START (0xFF001000)  /**vmp模块 错误码基值*/
+
 /***********************************************************
 *                          MMC模块错误码                   *
 ***********************************************************/

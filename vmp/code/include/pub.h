@@ -70,12 +70,11 @@
 #include <sys/time.h>
 #include <sys/resource.h>
 #include <execinfo.h>
-#include <mtd/mtd-user.h>  /**for define of MEMERASE */
+#include <mtd/mtd-user.h> /**for define of MEMERASE */
 #include <getopt.h>
 
 #include "types.h"
 #include "error.h"
-#include "flash.h"
 #include "mmc.h"
 #include "md5.h"
 #include "vmp.h"
