@@ -65,11 +65,11 @@ static int htoi(u8 *s)
  * @brief 获取当前总共有多少条版本控制信息
  * 
  * @param dev_info 版本信息存储位置
- * @param info_num 版本条目数
- * @param u32 *list
+ * @param locat_num 版本存储的拐点条目数，采用循环存储，从该值处倒序查找即可
+ * @param u32 *list总的条目数，如果大于VMP_VER_INFO_MAX_NUM说明有覆盖的情况发生
  * @return int 
  */
-int vmp_get_verctrl_infonum(u8 *dev_info, u16 *info_num, u32 *list)
+int vmp_get_verctrl_locat_list(u8 *dev_info, u16 *locat_num, u32 *list)
 {
     u16 loop = 0;
     u32 offset = 0;
@@ -107,7 +107,7 @@ int vmp_get_verctrl_infonum(u8 *dev_info, u16 *info_num, u32 *list)
         }
         offset += sizeof(struct vmp_verinfo_store);
     }
-    *info_num = num;
+    *locat_num = num;
     *list = list_num_old;
     mmc_close(locatfd);
     return SUCCESS;
@@ -324,29 +324,46 @@ int vmp_set_store_value(u8 ver_type, struct vmp_verinfo_store *verinfo_store,
  */
 int vmp_get_verctrl_info(u8 *dev_info, u16 info_num, u8 *data, u16 *true_num)
 {
-    u16 info_all_num = 0;
+    u16 info_locat_num = 0;
+    u16 info_all_num = 0; //版本总的条目数
     u32 ret = 0;
     u32 offset = 0;
     u32 list;
+    u8 *ver_data = data;
     if (info_num > VMP_VER_INFO_MAX_NUM)
     {
         return ERR_VMP_INFO_MAX_NUM;
     }
-    ret = vmp_get_verctrl_infonum(dev_info, &info_all_num, &list);
+    ret = vmp_get_verctrl_locat_list(dev_info, &info_locat_num, &list);
     if (ret)
         return ret;
+
+    if (list < VMP_VER_INFO_MAX_NUM) //如果没有循环发生，则拐点就是当前条目总数
+        info_all_num = info_locat_num;
+    else
+        info_all_num = VMP_VER_INFO_MAX_NUM;
 
     if (info_num > info_all_num)
         info_num = info_all_num; //如果获取条数大于总数，则获取最大数
 
-    *true_num = info_all_num;
+    *true_num = info_all_num; //真实的条目数
 
     if (0 == info_all_num)
         offset = 0; //没有信息的时候返回最开始的信息
     else
-        offset = (info_all_num - 1) * sizeof(struct vmp_verinfo_store); //最新一条的偏移
+        offset = (info_locat_num - 1) * sizeof(struct vmp_verinfo_store); //最新一条的偏移
 
-    ret = vmp_get_verctrl_infodata(dev_info, offset, info_num, data);
+    if (info_num < info_locat_num) //小于拐点，直接读取就可以
+    {
+        ret = vmp_get_verctrl_infodata(dev_info, offset, info_num, ver_data);
+    }
+    else //先倒序读取前半段，再倒序读取后半段
+    {
+        ret = vmp_get_verctrl_infodata(dev_info, offset, info_locat_num, ver_data);
+        offset = (VMP_VER_INFO_MAX_NUM - 1) * sizeof(struct vmp_verinfo_store); //最末尾一条的偏移
+        ver_data += sizeof(struct vmp_verinfo_store) * info_locat_num;
+        ret = vmp_get_verctrl_infodata(dev_info, offset, (info_num - info_locat_num), ver_data);
+    }
     if (ret)
         return ret;
 
@@ -362,7 +379,7 @@ int vmp_get_verctrl_info(u8 *dev_info, u16 info_num, u8 *data, u16 *true_num)
  */
 int vmp_set_verctrl_info(u8 *dev_info, u8 *data)
 {
-    u16 info_all_num = 0;
+    u16 info_locat_num = 0;
     u32 ret = 0;
     u32 offset = 0;
     s32 locatfd = -1;
@@ -371,15 +388,15 @@ int vmp_set_verctrl_info(u8 *dev_info, u8 *data)
     struct vmp_verinfo_store *write_data = NULL;
 
     write_data = (struct vmp_verinfo_store *)data;
-    ret = vmp_get_verctrl_infonum(dev_info, &info_all_num, &list);
+    ret = vmp_get_verctrl_locat_list(dev_info, &info_locat_num, &list);
     if (ret)
         return ret;
 
-    zlog_debug(zc, "have %d info", info_all_num);
-    if (info_all_num >= VMP_VER_INFO_MAX_NUM)
+    zlog_debug(zc, "info_locat_num %d info", info_locat_num);
+    if (info_locat_num >= VMP_VER_INFO_MAX_NUM)
         offset = 0;
     else
-        offset = info_all_num * sizeof(struct vmp_verinfo_store); //获取偏移
+        offset = info_locat_num * sizeof(struct vmp_verinfo_store); //获取偏移
 
     write_data->list_num = list + 1;
 
