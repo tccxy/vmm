@@ -334,6 +334,8 @@ int main(int argc, char *argv[])
         return -2;
     }
 
+    init_crc32_table(VMP_CRC_POLY);//初始化crc32表,用于校验控制字
+
     //zlog_info(zc, "info Separator========================");
     while ((opt = getopt_long_only(argc, argv, string, long_options, &option_index)) != -1)
     {

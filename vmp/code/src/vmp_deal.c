@@ -77,6 +77,7 @@ int vmp_get_verctrl_locat_list(u8 *dev_info, u16 *locat_num, u32 *list)
     s32 locatfd = -1;
     u32 list_num_old = 0;
     u32 list_num = 0;
+    u32 crc_value = 0;
     struct vmp_verinfo_store verinfo_store;
 
     locatfd = mmc_open(dev_info);
@@ -89,7 +90,11 @@ int vmp_get_verctrl_locat_list(u8 *dev_info, u16 *locat_num, u32 *list)
         }
         else
         {
-            if (VMP_VER_CTRL_INFO_MAGIC == verinfo_store.magic)
+            //计算存储控制字的有效数据位的crc值用于校验，防止由于异常断电等写入无效的控制字
+            crc_value = count_crc32((u8 *)&verinfo_store, sizeof(struct vmp_verinfo_store) - 4, 0);
+            zlog_debug(zc, "vmp_get_verctrl_locat_list crc_value %x ", crc_value);
+            if (VMP_VER_CTRL_INFO_MAGIC == verinfo_store.magic &&
+                crc_value == verinfo_store.crc)
             {
                 num++;
             }
@@ -385,6 +390,7 @@ int vmp_set_verctrl_info(u8 *dev_info, u8 *data)
     s32 locatfd = -1;
     u32 list;
     locatfd = mmc_open(dev_info);
+    u32 crc_value = 0;
     struct vmp_verinfo_store *write_data = NULL;
 
     write_data = (struct vmp_verinfo_store *)data;
@@ -399,6 +405,9 @@ int vmp_set_verctrl_info(u8 *dev_info, u8 *data)
         offset = info_locat_num * sizeof(struct vmp_verinfo_store); //获取偏移
 
     write_data->list_num = list + 1;
+    crc_value = count_crc32((u8 *)write_data, sizeof(struct vmp_verinfo_store) - 4, 0); //计算crc的值用于校验
+    write_data->crc = crc_value;
+    zlog_debug(zc, "vmp_set_verctrl_info crc_value %x ", crc_value);
 
     zlog_info(zc, "write_data->list_num %d ", write_data->list_num);
     if (0 > mmc_write(locatfd, offset, sizeof(struct vmp_verinfo_store),

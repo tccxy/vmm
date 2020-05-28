@@ -70,7 +70,7 @@ static size_t ftp_write_file(void *ptr, size_t size, size_t nmemb, void *stream)
  * @param tries 重试次数
  * @return int 
  */
-int ftp_download_file(const char *remote_path, const char *user, const char *passwd,
+static int ftp_download_file(const char *remote_path, const char *user, const char *passwd,
                       const char *localpath, long timeout, long tries)
 {
     FILE *file;
@@ -158,7 +158,7 @@ static size_t ftp_rcv_data(char *ptr, size_t size, size_t nmemb, void *userdata)
  * @param rcv_data 接受数据缓冲区
  * @return int 
  */
-int ftp_download_data(const char *remote_path, const char *user, const char *passwd,
+static int ftp_download_data(const char *remote_path, const char *user, const char *passwd,
                       const char *rcv_data)
 {
     CURL *curl;

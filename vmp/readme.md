@@ -1,14 +1,9 @@
 <!-- TOC -->
 
 - [版本管理](#版本管理)
-    - [概述](#概述)
-    - [版本划分](#版本划分)
-        - [1. 嵌入式设备的启动流程](#1-嵌入式设备的启动流程)
-    - [2.版本的定义](#2版本的定义)
-    - [3.安全可控的版本引导流程](#3安全可控的版本引导流程)
-        - [1）较为安全的方式A](#1较为安全的方式a)
-        - [2）较为节省空间的方式B](#2较为节省空间的方式b)
-    - [实现](#实现)
+  - [概述](#概述)
+  - [版本划分](#版本划分)
+  - [实现](#实现)
 
 <!-- /TOC -->
 # 版本管理
@@ -22,14 +17,14 @@
 //定义类型和描述
 st=>start: 开始
 e=>end: 结束
-op=>operation: BootRom
-op1=>operation: 一级loader
-op2=>operation: Uboot
-op3=>operation: Kernel
-op4=>operation: Rootfs
-op5=>operation: AppImage
+op_bootrom=>operation: BootRom
+op_loader=>operation: 一级loader
+op_uboot=>operation: Uboot
+op_kernel=>operation: Kernel
+op_rootfs=>operation: Rootfs
+op_app=>operation: AppImage
   
-st->op->op1->op2(right)->op3(right)->op4->op5->e
+st->op_bootrom->op_loader->op_uboot(right)->op_kernel(right)->op_rootfs->op_app->e
 
 ```
 
@@ -51,10 +46,10 @@ loader)。
 //定义类型和描述
 st=>start: 开始
 e=>end: 结束
-op=>operation: BootLoader
-op1=>operation: UserImage
+op_bootloader=>operation: BootLoader
+op_userimage=>operation: UserImage
   
-st->op(right)->op1->e
+st->op_bootloader(right)->op_userimage->e
 
 ```
 或者按照是否频繁更改的原则细化一下（通常系统版本不需要频繁的更改）
@@ -62,11 +57,11 @@ st->op(right)->op1->e
 //定义类型和描述
 st=>start: 开始
 e=>end: 结束
-op=>operation: BootLoader
-op1=>operation: SysImage
-op2=>operation: AppImage
+op_bootloader=>operation: BootLoader
+op_sysimage=>operation: SysImage
+op_appimage=>operation: AppImage
   
-st->op(right)->op1->op2->e
+st->op_bootloader(right)->op_sysimage->op_appimage->e
 
 ```
 ##2.版本的定义
@@ -101,14 +96,14 @@ Number  Start   End     Size    File system  Name     Flags
 //定义类型和描述
 st=>start: 开始
 e=>end: 结束
-op=>operation: BootLoader
-op1=>operation: UserImage_A
-op2=>operation: UserImage_B
-op3=>condition: 查询版本控制字
+op_bootloader=>operation: BootLoader
+op_userimage_a=>operation: UserImage_A
+op_userimage_b=>operation: UserImage_B
+op_cond=>condition: 查询版本控制字
   
-st->op(right)->op3
-op3(yes)->op1->e
-op3(no)->op2->e
+st->op_bootloader(right)->op_cond
+op_cond(yes)->op_userimage_a->e
+op_cond(no)->op_userimage_b->e
 ```
 如果以SysImage和AppImage的方法进行管理则其引导流程如下
 
@@ -116,31 +111,29 @@ op3(no)->op2->e
 //定义类型和描述
 st=>start: 开始
 e=>end: 结束
-op=>operation: BootLoader
-op1=>operation: SysImage_A
-op2=>operation: SysImage_B
-op3=>condition: 查询版本控制字
-op4=>condition: 查询版本控制字
-op5=>operation: AppImage_A
-op6=>operation: AppImage_B
+op_bootloader=>operation: BootLoader
+op_sys_a=>operation: SysImage_A
+op_sys_b=>operation: SysImage_B
+op_find_version_sys=>condition: 查询版本控制字
+op_find_version_app=>condition: 查询版本控制字
+op_app_a=>operation: AppImage_A
+op_app_b=>operation: AppImage_B
   
-st->op(right)->op3
-op3(yes)->op1->op4
-op3(no)->op2->op4
-op4(yes)->op5->e
-op4(no)->op6->e
+st->op_bootloader(right)->op_find_version_sys
+op_find_version_sys(yes)->op_sys_a->op_find_version_app
+op_find_version_sys(no)->op_sys_b->op_find_version_app
+op_find_version_app(yes)->op_app_a->e
+op_find_version_app(no)->op_app_b->e
 ```
 * 在升级的时候采用的方式同样如果当前为A版本，则向B版本的存储空间进行烧写，反之亦然，更新完成后同步更新版本控制字，进而达到重启后生效的目的。
 ```flow
 //定义类型和描述
 st=>start: 开始
 e=>end: 结束
-op=>operation: BootLoader
-op1=>operation: UserImage_A
-op2=>operation: UserImage_B
-op3=>condition: 查询版本控制字
+op_userimage_a=>operation: UserImage_A
+op_userimage_b=>operation: UserImage_B
   
-st->op1(right)->op2->op1
+st->op_userimage_a(right)->op_userimage_b->op_userimage_a
 ```
 这种升级方式的优点是，在升级的过程中无需重启，而是向另一块存储空间写入，即使更新的过程中出现故障，并不会影响设备的运行，同时可以通过一些用户空间的逻辑去做一些版本的回退等安全机制
 
@@ -154,14 +147,14 @@ st->op1(right)->op2->op1
 //定义类型和描述
 st=>start: 开始
 e=>end: 结束
-op=>operation: BootLoader
-op1=>operation: 更新版本
-op2=>operation: UserImage
-op3=>condition: 查询版本控制字
+op_bootloader=>operation: BootLoader
+op_updateversion=>operation: 更新版本
+op_userimage_a=>operation: UserImage
+op_findversion=>condition: 查询版本控制字
   
-st->op(right)->op3
-op3(yes)->op1->e
-op3(no)->op2->e
+st->op_bootloader(right)->op_findversion
+op_findversion(yes)->op_updateversion->e
+op_findversion(no)->op_userimage_a->e
 ```
 这种升级方式的好处就是节省存储空间，但是在写入的整个过程中不能够出现意外的情况，而且要在用户空间
 为待更新版本留够足够的空间，这也是类似于现在的安卓手机的版本更新方式。

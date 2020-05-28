@@ -73,7 +73,7 @@ static size_t http_write_file(void *ptr, size_t size, size_t nmemb, void *stream
  * @param version_type 版本类型
  * @return u8* 
  */
-u8 *http_creat_json(char *id, char *secret, u8 num, u8 version_type)
+static u8 *http_creat_json(char *id, char *secret, u8 num, u8 version_type)
 {
     u8 *string = NULL;
 
@@ -143,7 +143,7 @@ static size_t http_rcv_data(char *ptr, size_t size, size_t nmemb, void *userdata
  * @param rcv_data 接收的json数据
  * @return int 
  */
-int http_post_data(u8 *url, u8 *send_data, u8 *rcv_data)
+static int http_post_data(u8 *url, u8 *send_data, u8 *rcv_data)
 {
     CURL *curl_handle = NULL;
     CURLcode curl_res;
@@ -197,7 +197,7 @@ int http_post_data(u8 *url, u8 *send_data, u8 *rcv_data)
  * @param tries 重试次数
  * @return int 
  */
-int http_download_file(const char *remotepath, const char *localpath, long timeout, long tries)
+static int http_download_file(const char *remotepath, const char *localpath, long timeout, long tries)
 {
     FILE *file;
     curl_off_t local_file_len = -1;
@@ -269,7 +269,7 @@ int http_download_file(const char *remotepath, const char *localpath, long timeo
  * @return int 
  */
 static u8 download_url[VMP_MAX_SUB_VER_NUM][1024] = {0}; /**用于存储下载版本的url*/
-int http_prase_verdata(u8 *json_data, struct vmp_mainver_info *mainver_info)
+static int http_prase_verdata(u8 *json_data, struct vmp_mainver_info *mainver_info)
 {
     cJSON *head = NULL;
     cJSON *data = NULL;
