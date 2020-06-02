@@ -1,34 +1,19 @@
-#注意等号两边的空格 以及名字不要以数字打头 注意子版本的顺序
-#设备类型
-DevType = 0x01
-#版本类型 0x00 is boot 0x01 is sys 0x02 is app 
-VerType1 = 0x01
-#主版本号
-BootMainVersion = 1.xx.xx
-#主版本名字 与conf中对应
-BootMainName = BOOT
-#子版本名字 与conf中对应 如有多个 按照conf的顺序罗列就可 
-BootSubName = BOOT.bin
-#子版本号
-BootSubVersion =1.xx.xx
-#子版本crc
-BootSubCrc = xxxx
-#注意顺序
-BootSubName = BOOT2.bin
-BootSubVersion =1.xx.xx
-BootSubCrc = xxxx
-#主版本
-#SysMainVersion =1.xx.xx
-#SysMainName = SYS
-#SysSubName = image.ub
-#SysSubVersion =1.xx.xx
-#SysSubCrc = xxxx
-#SysSubName = ubuntu16.04
-#SysSubVersion =1.xx.xx
-#SysSubCrc = xxxx
-#主版本
-#AppMainVerion =1.xx.xx
-#AppMainName = APP
-#AppSubName = AB_app
-#AppSubVersion =1.xx.xx
-#AppSubCrc = xxxx
+{
+    "mainVersion": "1.00.02",
+    "subFiles": [
+        {
+            "subVersion": "1.00.00",
+            "subName": "pl_1.00.00.ext4",
+            "subSize": "266338304",
+            "subMd5": "07308683b76e68497d67569591b12229"
+        },
+        {
+            "subVersion": "1.00.00",
+            "subName": "sc_1.00.00.ext4",
+            "subSize": "266338304",
+            "subMd5": "eb1d10ff214c48c3eae3d55c4252940c"
+        }
+    ]
+}
+#子版本的位置与conf一定要一致！！！
+#可以使用https://www.sojson.com/editor.html校验json格式

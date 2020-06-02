@@ -71,7 +71,7 @@ static size_t ftp_write_file(void *ptr, size_t size, size_t nmemb, void *stream)
  * @return int 
  */
 static int ftp_download_file(const char *remote_path, const char *user, const char *passwd,
-                      const char *localpath, long timeout, long tries)
+                             const char *localpath, long timeout, long tries)
 {
     FILE *file;
     curl_off_t local_file_len = -1;
@@ -159,7 +159,7 @@ static size_t ftp_rcv_data(char *ptr, size_t size, size_t nmemb, void *userdata)
  * @return int 
  */
 static int ftp_download_data(const char *remote_path, const char *user, const char *passwd,
-                      const char *rcv_data)
+                             const char *rcv_data)
 {
     CURL *curl;
     CURLcode ret;
@@ -193,130 +193,81 @@ static int ftp_download_data(const char *remote_path, const char *user, const ch
 }
 
 /**
- * @brief 分解字符串中的键值和数据
- * 
- * @param line 
- * @param key 
- * @param value 
- * @return u32 
- */
-static u32 ftp_parse_keyvalue(char *line, char **key, char **value)
-{
-    //获取Key
-    while (' ' == *line || '\t' == *line)
-    {
-        line++;
-    }
-    *key = line;
-    while (0 != *line && ' ' != *line && '\t' != *line && '=' != *line)
-    {
-        line++;
-    }
-    if ('\0' == *line)
-    {
-        return ERR_VMP_STRING_FORMAT;
-    }
-    *line++ = '\0';
-
-    //判断格式是否正确
-    while (' ' == *line || '\t' == *line)
-    {
-        line++;
-    }
-    if ('=' != *line)
-    {
-        return ERR_VMP_STRING_FORMAT;
-    }
-    line++;
-
-    //获取Value
-    while (' ' == *line || '\t' == *line)
-    {
-        line++;
-    }
-    *value = line;
-    while (0 != *line && ' ' != *line && '\t' != *line)
-    {
-        line++;
-    }
-    *line = '\0';
-
-    return SUCCESS;
-}
-
-/**
  * @brief 解析版本描述文件
  * 
  * @param mainver_def conf中定义的版本描述文件
- * @param version_data 传入的待解析文件
+ * @param version_data 传入的待解析文件json格式
  * @param verinfo_store 临时存储版本信息的数据结构
  * 
  * @return int 解析结果0 为成功
  */
 static int ftp_parse_version_description(u8 *version_data, struct vmp_mainver_info *mainver_info)
 {
-    u8 line_buf[128];
-    u8 *line = NULL;
-    u8 *key = NULL;
-    u8 iname = 0;
-    u8 iversion = 0;
-    u8 imd5 = 0;
-    u8 isize = 0;
-    u8 *value;
+    cJSON *head = NULL;
+    cJSON *main_ver = NULL;
+    cJSON *sub_file = NULL;
+    cJSON *sub_obj = NULL;
+    cJSON *sub_name = NULL;
+    cJSON *sub_ver = NULL;
+    cJSON *sub_size = NULL;
+    cJSON *sub_md5 = NULL;
+    u32 size = 0, i = 0;
 
-    if (NULL == version_data)
-        return ERR_VMP_NULL_POINTER;
-
-    while (0 != *version_data)
+    head = cJSON_Parse(version_data); //获取整个大的句柄
+    if (NULL == head)
     {
-        //获取行数据
-        line = line_buf;
-        while ('\0' != *version_data && '\r' != *version_data && '\n' != *version_data)
-        {
-            *line++ = *version_data++;
-        }
-        version_data++;
-        *line = '\0';
-
-        if ('\0' == line_buf[0] || '#' == line_buf[0])
-        {
-            continue;
-        }
-        //分解键值和数据
-        if (SUCCESS != ftp_parse_keyvalue(line_buf, &key, &value))
-        {
-            continue;
-        }
-        //判断数据是否超长
-        if (VMP_DEFINE_NAME_LEN <= strlen((char *)value))
-        {
-            return ERR_VMP_VERSION_INFO_STRING;
-        }
-        zlog_debug(zc, "key = '%s', value = '%s' ", key, value);
-        if (NULL != strstr(key, "mainVersion"))
-            memcpy(mainver_info->mainver_version, value, strlen(value));
-        //if (NULL != strstr(key, "mainName"))
-        //memcpy(mainver_info->mainver_name, value, strlen(value));
-
-        if (NULL != strstr(key, "sub") && NULL != strstr(key, "Name"))
-            memcpy(mainver_info->subver_info[iname++].subver_name, value, strlen(value));
-
-        if (NULL != strstr(key, "sub") && NULL != strstr(key, "Version"))
-            memcpy(mainver_info->subver_info[iversion++].subver_version, value, strlen(value));
-
-        if (NULL != strstr(key, "sub") && NULL != strstr(key, "Md5"))
-            memcpy(mainver_info->subver_info[imd5++].md5, value, strlen(value));
-
-        if (NULL != strstr(key, "sub") && NULL != strstr(key, "Size"))
-            mainver_info->subver_info[isize++].size = atoi(value);
+        return ERR_FTP_PARSE_JSON;
     }
-    if (imd5 == iversion && iversion == iname)
+    zlog_debug(zc, "head get success ");
+    main_ver = cJSON_GetObjectItem(head, "mainVersion");
+    if (main_ver->valuestring != NULL)
     {
-        mainver_info->subver_num = iname;
-        return SUCCESS;
+        zlog_debug(zc, "MainVersion %s ", main_ver->valuestring);
     }
-    else
+    memcpy(mainver_info->mainver_version, main_ver->valuestring, strlen(main_ver->valuestring));
+    sub_file = cJSON_GetObjectItem(head, "subFiles");
+    size = cJSON_GetArraySize(sub_file);
+    zlog_debug(zc, "sub ver num  %d ", size);
+    //加一个校验
+    if (size > VMP_MAX_SUB_VER_NUM)
+    {
         return ERR_FTP_SUBVER_NUM;
+    }
+    mainver_info->subver_num = size;
+
+    for (i = 0; i < size; i++)
+    {
+        sub_obj = cJSON_GetArrayItem(sub_file, i);
+        sub_name = cJSON_GetObjectItem(sub_obj, "subName");
+        if (sub_name->valuestring != NULL)
+        {
+            zlog_debug(zc, "sub_name %s ", sub_name->valuestring);
+        }
+        memcpy(mainver_info->subver_info[i].subver_name, sub_name->valuestring, strlen(sub_name->valuestring));
+
+        sub_ver = cJSON_GetObjectItem(sub_obj, "subVersion");
+        if (sub_ver->valuestring != NULL)
+        {
+            zlog_debug(zc, "sub_ver %s ", sub_ver->valuestring);
+        }
+        memcpy(mainver_info->subver_info[i].subver_version, sub_ver->valuestring, strlen(sub_ver->valuestring));
+
+        sub_size = cJSON_GetObjectItem(sub_obj, "subSize");
+        if (sub_size->valuestring != NULL)
+        {
+            zlog_debug(zc, "sub_size %s ", sub_size->valuestring);
+        }
+        mainver_info->subver_info[i].size = atoi(sub_size->valuestring);
+
+        sub_md5 = cJSON_GetObjectItem(sub_obj, "subMd5");
+        if (sub_md5->valuestring != NULL)
+        {
+            zlog_debug(zc, "sub_md5 %s ", sub_md5->valuestring);
+        }
+        memcpy(mainver_info->subver_info[i].md5, sub_md5->valuestring, strlen(sub_md5->valuestring));
+    }
+
+    return SUCCESS;
 }
 
 /**
@@ -354,7 +305,7 @@ int vmp_ftp_parse_verdata(struct vmp_get_data *get_data, struct vmp_mainver_info
     ret = ftp_download_data(url, user, passwd, ga_trans_data);
     if (ret)
         return ret;
-    //zlog_debug(zc,"rcv_data %s ", ga_trans_data);
+    zlog_debug(zc,"rcv_data %s ", ga_trans_data);
     ret = ftp_parse_version_description(ga_trans_data, mainver_info);
     if (ret)
         return ret;

@@ -35,7 +35,7 @@
 #define ERR_FTP_TRANS_ERROR (ERR_FTP_START + 2)  /**传输错误 */
 #define ERR_FTP_FILE_MD5 (ERR_FTP_START + 3)     /**md5校验错误 */
 #define ERR_FTP_SUBVER_NUM (ERR_FTP_START + 4)   /**子版本个数错误 */
-#define ERR_FTP_NULL_POINTER (ERR_FTP_START + 5) /**空指针错误*/
+#define ERR_FTP_PARSE_JSON (ERR_FTP_START + 5) /**空指针错误*/
 /***********************************************************
 *   HTTP错误码                                             *
 ***********************************************************/

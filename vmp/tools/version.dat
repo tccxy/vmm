@@ -1,0 +1,19 @@
+{
+    "mainVersion": "1.00.02",
+    "subFiles": [
+        {
+            "subVersion": "1.00.00",
+            "subName": "pl_1.00.00.ext4",
+            "subSize": "266338304",
+            "subMd5": "07308683b76e68497d67569591b12229"
+        },
+        {
+            "subVersion": "1.00.00",
+            "subName": "sc_1.00.00.ext4",
+            "subSize": "266338304",
+            "subMd5": "eb1d10ff214c48c3eae3d55c4252940c"
+        }
+    ]
+}
+#子版本的位置与conf一定要一致！！！
+#可以使用https://www.sojson.com/editor.html校验json格式

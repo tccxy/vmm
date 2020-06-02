@@ -64,7 +64,7 @@ op_appimage=>operation: AppImage
 st->op_bootloader(right)->op_sysimage->op_appimage->e
 
 ```
-##2.版本的定义
+###2.版本的定义
 
 我们将BootLoader定义为主版本，其包含的一级loader、uboot等定义为子版本，同理将SysImage定义为
 主版本，其包含的kernel、rootfs定义为子版本，AppImage也可以包含appimage1、appiamge2等，如果
@@ -83,10 +83,10 @@ Number  Start   End     Size    File system  Name     Flags
  
 (parted)
 ```
-##3.安全可控的版本引导流程
+###3.安全可控的版本引导流程
 
 版本的升级引导主要有以下两种方式，其中的优劣势都很明显
-###1）较为安全的方式A
+####1）较为安全的方式A
 
 为了防止在版本升级过程中，发生断电等异常情况的产生，在存储介质中除了BootLoader外，其他的版本都采
 用双版本的形式进行存储，通过版本控制字来记录版本的更新等信息，如果采用UserImage的方式进行存储，则
@@ -139,7 +139,7 @@ st->op_userimage_a(right)->op_userimage_b->op_userimage_a
 
 缺点就是占用的存储空间较大，是版本的2倍
 
-###2）较为节省空间的方式B
+####2）较为节省空间的方式B
 
 较为节省空间的存储形式则是在存储介质中全部以单版本的形式进行存储，当有版本需要进行更新时，在用户
 空间进行版本的拉取，然后更新版本控制字，版本的更新写入则由重启后的BootLoader执行

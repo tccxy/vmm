@@ -11,6 +11,3 @@ doxygen
 会产生成html文件夹，使用浏览器打开index.html即可
 **此文档视为详细设计** 
 
-# user_manual.md为使用说明
-
-# version.dat 为版本描述信息模板

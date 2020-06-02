@@ -5,3 +5,7 @@
 * 因采用的gpt分区，要求宿主机安装parted工具
 * zynq系列对gpt分区支持，不好，需作更改
 * usp_log.conf 为zlog的日志记录模板
+
+# user_manual.md为使用说明
+
+# version.dat 为版本描述信息模板

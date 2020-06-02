@@ -297,7 +297,7 @@ static int http_prase_verdata(u8 *json_data, struct vmp_mainver_info *mainver_in
     main_ver = cJSON_GetObjectItem(data, "mainVersion");
     if (main_ver->valuestring != NULL)
     {
-        zlog_debug(zc,"appMainVersion %s ", main_ver->valuestring);
+        zlog_debug(zc,"MainVersion %s ", main_ver->valuestring);
     }
     memcpy(mainver_info->mainver_version, main_ver->valuestring, strlen(main_ver->valuestring));
     sub_file = cJSON_GetObjectItem(data, "subFiles");
