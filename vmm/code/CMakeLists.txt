@@ -1,8 +1,8 @@
-# cmake for vmp
+# cmake for vmm
 cmake_minimum_required(VERSION 3.5.1)
-project(vmp)
+project(vmm)
 # name
-set(PROJECT_NAME vmp)
+set(PROJECT_NAME vmm)
 
 
 option(ZYNQMP "option for zynqmp" OFF)

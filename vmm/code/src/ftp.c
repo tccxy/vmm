@@ -201,7 +201,7 @@ static int ftp_download_data(const char *remote_path, const char *user, const ch
  * 
  * @return int 解析结果0 为成功
  */
-static int ftp_parse_version_description(u8 *version_data, struct vmp_mainver_info *mainver_info)
+static int ftp_parse_version_description(u8 *version_data, struct vmm_mainver_info *mainver_info)
 {
     cJSON *head = NULL;
     cJSON *main_ver = NULL;
@@ -229,7 +229,7 @@ static int ftp_parse_version_description(u8 *version_data, struct vmp_mainver_in
     size = cJSON_GetArraySize(sub_file);
     zlog_debug(zc, "sub ver num  %d ", size);
     //加一个校验
-    if (size > VMP_MAX_SUB_VER_NUM)
+    if (size > VMM_MAX_SUB_VER_NUM)
     {
         return ERR_FTP_SUBVER_NUM;
     }
@@ -282,7 +282,7 @@ static int ftp_parse_version_description(u8 *version_data, struct vmp_mainver_in
 static u8 ftp_server_data[1024];
 static u8 ftp_usr[1024];
 static u8 ftp_passwd[1024];
-int vmp_ftp_parse_verdata(struct vmp_get_data *get_data, struct vmp_mainver_info *mainver_info)
+int vmm_ftp_parse_verdata(struct vmm_get_data *get_data, struct vmm_mainver_info *mainver_info)
 {
     u32 ret = SUCCESS;
     u8 filename[1024], user[1024], passwd[1024], url[1024];
@@ -322,12 +322,12 @@ int vmp_ftp_parse_verdata(struct vmp_get_data *get_data, struct vmp_mainver_info
  * @return int 
  */
 #define MD5_BUF_SIZE (10 * 1024 * 1024)
-int vmp_ftp_version_file(u8 sub_index, u8 *version_file, u8 *version_locat, u8 *version_md5, u64 version_size)
+int vmm_ftp_version_file(u8 sub_index, u8 *version_file, u8 *version_locat, u8 *version_md5, u64 version_size)
 {
     u32 ret = SUCCESS;
     u8 url[1024];
-    u8 md5_value[VMP_DEFINE_NAME_LEN] = {0};
-    u8 md5_cmd[VMP_DEFINE_NAME_LEN] = {0};
+    u8 md5_value[VMM_DEFINE_NAME_LEN] = {0};
+    u8 md5_cmd[VMM_DEFINE_NAME_LEN] = {0};
     FILE *fp;
 
     sprintf(url, "%s/%s", ftp_server_data, version_file); //构造完整路径

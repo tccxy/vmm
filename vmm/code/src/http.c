@@ -85,16 +85,16 @@ static u8 *http_creat_json(char *id, char *secret, u8 num, u8 version_type)
     cJSON_AddStringToObject(head, "otaId", id);
     cJSON_AddStringToObject(head, "otaSecret", secret);
     cJSON_AddNumberToObject(head, "ducCpuNum", num);
-    if (VMP_VER_TYPE_BOOT == version_type)
+    if (VMM_VER_TYPE_BOOT == version_type)
     {
         cJSON_AddStringToObject(head, "mainType", "boot");
     }
-    else if (VMP_VER_TYPE_SYS == version_type)
+    else if (VMM_VER_TYPE_SYS == version_type)
     {
         cJSON_AddStringToObject(head, "mainType", "sys");
     }
-#ifdef VMP_MANAGE_APP_EN
-    else if (VMP_VER_TYPE_APP == version_type)
+#ifdef VMM_MANAGE_APP_EN
+    else if (VMM_VER_TYPE_APP == version_type)
     {
         cJSON_AddStringToObject(head, "mainType", "app");
     }
@@ -268,8 +268,8 @@ static int http_download_file(const char *remotepath, const char *localpath, lon
  * @param mainver_info 版本描述文件
  * @return int 
  */
-static u8 download_url[VMP_MAX_SUB_VER_NUM][1024] = {0}; /**用于存储下载版本的url*/
-static int http_prase_verdata(u8 *json_data, struct vmp_mainver_info *mainver_info)
+static u8 download_url[VMM_MAX_SUB_VER_NUM][1024] = {0}; /**用于存储下载版本的url*/
+static int http_prase_verdata(u8 *json_data, struct vmm_mainver_info *mainver_info)
 {
     cJSON *head = NULL;
     cJSON *data = NULL;
@@ -304,7 +304,7 @@ static int http_prase_verdata(u8 *json_data, struct vmp_mainver_info *mainver_in
     size = cJSON_GetArraySize(sub_file);
     zlog_debug(zc,"sub ver num  %d ", size);
     //加一个校验
-    if (size > VMP_MAX_SUB_VER_NUM)
+    if (size > VMM_MAX_SUB_VER_NUM)
     {
         return ERR_HTTP_SUB_NUM;
     }
@@ -357,7 +357,7 @@ static int http_prase_verdata(u8 *json_data, struct vmp_mainver_info *mainver_in
  *  * @param http_data 数据信息
  * @return int 
  */
-int vmp_http_parse_verdata(struct vmp_get_data *get_data, struct vmp_mainver_info *mainver_info)
+int vmm_http_parse_verdata(struct vmm_get_data *get_data, struct vmm_mainver_info *mainver_info)
 {
     u32 ret = SUCCESS;
     u8 ota_id[1024], ota_secret[1024];
@@ -398,11 +398,11 @@ int vmp_http_parse_verdata(struct vmp_get_data *get_data, struct vmp_mainver_inf
  * @param version_size 版本大小
  * @return int 
  */
-int vmp_http_version_file(u8 sub_index, u8 *version_file, u8 *version_locat, u8 *version_md5, u64 version_size)
+int vmm_http_version_file(u8 sub_index, u8 *version_file, u8 *version_locat, u8 *version_md5, u64 version_size)
 {
     u32 ret = SUCCESS;
-    u8 md5_value[VMP_DEFINE_NAME_LEN] = {0};
-    u8 md5_cmd[VMP_DEFINE_NAME_LEN] = {0};
+    u8 md5_value[VMM_DEFINE_NAME_LEN] = {0};
+    u8 md5_cmd[VMM_DEFINE_NAME_LEN] = {0};
     FILE *fp;
 
     zlog_debug(zc,"url is %s ", (u8 *)&download_url[sub_index][0]);

@@ -54,7 +54,7 @@ LIB_CP :
 	cp $(ROOT_DIR)/3rd_opensrc/zlog_install/$(LIB)/lib*.so* $(REL_DIR) -Rf
 BIN :
 	@echo creat destination directory!$(CC)! $(shell date)
-	$(CC) $(OBJ_DIR)/*.o -o $(REL_DIR)/vmp $(CFLAGS) $(DFLAGS)
+	$(CC) $(OBJ_DIR)/*.o -o $(REL_DIR)/vmm $(CFLAGS) $(DFLAGS)
 clean :
 	rm -rf $(OBJ_DIR)
 	rm -rf $(REL_DIR)

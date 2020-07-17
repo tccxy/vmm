@@ -3,8 +3,8 @@ OBJS := $(OBJ_DIR)/mmc.o \
 		$(OBJ_DIR)/md5.o \
 		$(OBJ_DIR)/ftp.o \
 		$(OBJ_DIR)/http.o \
-		$(OBJ_DIR)/vmp_deal.o \
-		$(OBJ_DIR)/vmp.o \
+		$(OBJ_DIR)/vmm_deal.o \
+		$(OBJ_DIR)/vmm.o \
 
 
 
@@ -27,8 +27,8 @@ $(OBJ_DIR)/ftp.o : ./ftp.c
 $(OBJ_DIR)/http.o : ./http.c
 	$(CC) $(CFLAGS) $(DFLAGS) -c $< -o $@
 
-$(OBJ_DIR)/vmp_deal.o : ./vmp_deal.c
+$(OBJ_DIR)/vmm_deal.o : ./vmm_deal.c
 	$(CC) $(CFLAGS) $(DFLAGS) -c $< -o $@
 
-$(OBJ_DIR)/vmp.o : ./vmp.c
+$(OBJ_DIR)/vmm.o : ./vmm.c
 	$(CC) $(CFLAGS) $(DFLAGS) -c $< -o $@

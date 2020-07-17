@@ -77,7 +77,7 @@
 #include "error.h"
 #include "mmc.h"
 #include "md5.h"
-#include "vmp.h"
+#include "vmm.h"
 #include "cJSON.h"
 #include <curl/curl.h>
 #include <curl/easy.h>

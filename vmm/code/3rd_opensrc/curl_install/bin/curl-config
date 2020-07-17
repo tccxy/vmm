@@ -21,7 +21,7 @@
 #
 ###########################################################################
 
-prefix=/home/zw/swap/work/vmp/code/3rd_opensrc/curl_install
+prefix=/home/zw/swap/work/vmm/code/3rd_opensrc/curl_install
 exec_prefix=${prefix}
 includedir=${prefix}/include
 cppflag_curl_staticlib=-DCURL_STATICLIB
@@ -172,7 +172,7 @@ while test $# -gt 0; do
 
     --static-libs)
         if test "Xyes" != "Xno" ; then
-          echo ${exec_prefix}/lib/libcurl.a -L/home/zw/swap/work/vmp/code/3rd_opensrc/openssl_install/lib -lssl -lcrypto -lssl -lcrypto
+          echo ${exec_prefix}/lib/libcurl.a -L/home/zw/swap/work/vmm/code/3rd_opensrc/openssl_install/lib -lssl -lcrypto -lssl -lcrypto
         else
           echo "curl was built with static libraries disabled" >&2
           exit 1
@@ -180,7 +180,7 @@ while test $# -gt 0; do
         ;;
 
     --configure)
-        echo " '--prefix=/home/zw/swap/work/vmp/code/3rd_opensrc/curl_install/' '--host=aarch64-linux' '--disable-ares' '--disable-dict' '--enable-file' '--disable-gopher' '--disable-idn' '--disable-imap' '--disable-ipv6' '--disable-largefile' '--disable-ldap' '--disable-manual' '--disable-pop3' '--disable-proxy' '--disable-rt' '--disable-rtsp' '--disable-smb' '--disable-smtp' '--disable-sspi' '--disable-shared' '--disable-telnet' '--disable-threaded-resolver' '--enable-tftp' '--enable-static' '--without-axtls' '--without-cyassl' '--without-darwinssl' '--without-gnutls' '--without-libidn2' '--without-librtmp' '--without-libssh2' '--without-mbedtls' '--without-nghttp2' '--without-nss' '--without-polarssl' '--with-ssl=/home/zw/swap/work/vmp/code/3rd_opensrc/openssl_install' '--without-winssl' '--without-zlib' 'CC=aarch64-linux-gnu-gcc' 'host_alias=aarch64-linux'"
+        echo " '--prefix=/home/zw/swap/work/vmm/code/3rd_opensrc/curl_install/' '--host=aarch64-linux' '--disable-ares' '--disable-dict' '--enable-file' '--disable-gopher' '--disable-idn' '--disable-imap' '--disable-ipv6' '--disable-largefile' '--disable-ldap' '--disable-manual' '--disable-pop3' '--disable-proxy' '--disable-rt' '--disable-rtsp' '--disable-smb' '--disable-smtp' '--disable-sspi' '--disable-shared' '--disable-telnet' '--disable-threaded-resolver' '--enable-tftp' '--enable-static' '--without-axtls' '--without-cyassl' '--without-darwinssl' '--without-gnutls' '--without-libidn2' '--without-librtmp' '--without-libssh2' '--without-mbedtls' '--without-nghttp2' '--without-nss' '--without-polarssl' '--with-ssl=/home/zw/swap/work/vmm/code/3rd_opensrc/openssl_install' '--without-winssl' '--without-zlib' 'CC=aarch64-linux-gnu-gcc' 'host_alias=aarch64-linux'"
         ;;
 
     *)

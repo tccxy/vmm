@@ -17,7 +17,7 @@
 #define ERR_MMC_START (0xFF000100)  /**mmc模块 错误码基值*/
 #define ERR_HTTP_START (0xFF000300) /**HTTP模块 错误码基值*/
 #define ERR_FTP_START (0xFF000400)  /**FTP模块 错误码基值*/
-#define ERR_VMP_START (0xFF001000)  /**vmp模块 错误码基值*/
+#define ERR_VMM_START (0xFF001000)  /**vmm模块 错误码基值*/
 
 /***********************************************************
 *                          MMC模块错误码                   *
@@ -47,18 +47,18 @@
 #define ERR_HTTP_DOWNLOAD_FILE (ERR_HTTP_START + 6) /**下载文件错误 */
 #define ERR_HTTP_FILE_MD5 (ERR_HTTP_START + 7)      /**md5校验错误 */
 /***********************************************************
-*                          VMP模块错误码                   *
+*                          VMM模块错误码                   *
 ***********************************************************/
-#define ERR_VMP_NULL_POINTER (ERR_VMP_START + 1)        /**vmp空指针错误*/
-#define ERR_VMP_STRING_FORMAT (ERR_VMP_START + 2)       /**vmp字符串格式错误*/
-#define ERR_VMP_VERSION_INFO_STRING (ERR_VMP_START + 3) /**vmp版本信息格式错误*/
-#define ERR_VMP_DATA_FORMAT (ERR_VMP_START + 4)         /**vmp cmd数据格式错误*/
-#define ERR_VMP_FTP_OPEN (ERR_VMP_START + 5)            /**vmp ftp打开错误*/
-#define ERR_VMP_FTP_RECV (ERR_VMP_START + 6)            /**vmp ftp接收错误*/
-#define ERR_VMP_SUBVER_NUM (ERR_VMP_START + 7)          /**vmp 子版本数量比较错误*/
-#define ERR_VMP_INFO_MAX_NUM (ERR_VMP_START + 8)        /**vmp 子版本数量过多错误*/
-#define ERR_VMP_INFO_READ (ERR_VMP_START + 9)           /**vmp 版本信息读取错误*/
-#define ERR_VMP_INFO_WRITE (ERR_VMP_START + 10)         /**vmp 版本信息写入错误*/
-#define ERR_VMP_SUBNUM_CHECK (ERR_VMP_START + 11)       /**vmp 子版本校验错误*/
-#define ERR_VMP_FILE_WRITE (ERR_VMP_START + 12)         /**vmp 版本信息写入错误*/
-#define ERR_VMP_FILE_MD5 (ERR_VMP_START + 13)           /**vmp 版本md5校验错误*/
+#define ERR_VMM_NULL_POINTER (ERR_VMM_START + 1)        /**vmm空指针错误*/
+#define ERR_VMM_STRING_FORMAT (ERR_VMM_START + 2)       /**vmm字符串格式错误*/
+#define ERR_VMM_VERSION_INFO_STRING (ERR_VMM_START + 3) /**vmm版本信息格式错误*/
+#define ERR_VMM_DATA_FORMAT (ERR_VMM_START + 4)         /**vmm cmd数据格式错误*/
+#define ERR_VMM_FTP_OPEN (ERR_VMM_START + 5)            /**vmm ftp打开错误*/
+#define ERR_VMM_FTP_RECV (ERR_VMM_START + 6)            /**vmm ftp接收错误*/
+#define ERR_VMM_SUBVER_NUM (ERR_VMM_START + 7)          /**vmm 子版本数量比较错误*/
+#define ERR_VMM_INFO_MAX_NUM (ERR_VMM_START + 8)        /**vmm 子版本数量过多错误*/
+#define ERR_VMM_INFO_READ (ERR_VMM_START + 9)           /**vmm 版本信息读取错误*/
+#define ERR_VMM_INFO_WRITE (ERR_VMM_START + 10)         /**vmm 版本信息写入错误*/
+#define ERR_VMM_SUBNUM_CHECK (ERR_VMM_START + 11)       /**vmm 子版本校验错误*/
+#define ERR_VMM_FILE_WRITE (ERR_VMM_START + 12)         /**vmm 版本信息写入错误*/
+#define ERR_VMM_FILE_MD5 (ERR_VMM_START + 13)           /**vmm 版本md5校验错误*/

@@ -1,4 +1,4 @@
-prefix=/home/zw/swap/work/vmp/code/3rd_opensrc/openssl_install
+prefix=/home/zw/swap/work/vmm/code/3rd_opensrc/openssl_install
 exec_prefix=${prefix}
 libdir=${exec_prefix}/lib
 includedir=${prefix}/include
