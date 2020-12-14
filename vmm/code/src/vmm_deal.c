@@ -18,7 +18,9 @@
 #ifdef ZQ7020
 #include "vmm_zq7020.conf"
 #endif
-
+#ifdef A311D
+#include "vmm_a311d.conf"
+#endif
 /**用来临时存储传输文件*/
 u8 ga_trans_data[VMM_TRANS_FILEDATA_LEN];
 

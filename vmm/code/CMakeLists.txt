@@ -7,7 +7,7 @@ set(PROJECT_NAME vmm)
 
 option(ZYNQMP "option for zynqmp" OFF)
 option(ZQ7020 "option for zq7020" OFF)
-option(RK3399 "option for rk3399" OFF)
+option(RK3399 "option for rk3399" ON)
 
 
 # set cmake cross compile
